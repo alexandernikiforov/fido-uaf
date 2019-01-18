@@ -1,0 +1,22 @@
+[
+  {
+    "header": {
+      "op": "Dereg",
+      "upv": {
+        "major": 1,
+        "minor": 1
+      },
+      "appID": "https://uaf-test-1.noknoktest.com:8443/SampleApp/uaf/facets"
+    },
+    "authenticators": [
+      {
+        "aaid": "ABCD#ABCD",
+        "keyID": "1"
+      },
+      {
+        "aaid": "ABCD#ABCD",
+        "keyID": "2"
+      }
+    ]
+  }
+]

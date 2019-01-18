@@ -1,0 +1,31 @@
+group 'ch.alni'
+version '0.1.0'
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    apply plugin: 'idea'
+}
+
+subprojects {
+    ext {
+        generatedJavaDir = "$buildDir/generated/java"
+    }
+    
+    afterEvaluate { Project project ->
+        project.tasks.withType(JavaCompile) {
+            sourceCompatibility = '1.8'
+            targetCompatibility = '1.8'
+            
+            compileJava {
+                options.compilerArgs += ["-s", "$project.generatedJavaDir"]
+            }
+        }
+    }
+}
+
+wrapper {
+    gradleVersion = '5.0'
+}

@@ -1,0 +1,5 @@
+rootProject.name = 'fido-uaf'
+
+include 'fido-uaf-tlv'
+include 'fido-uaf-protocol-v11'
+
