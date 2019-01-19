@@ -23,6 +23,7 @@ import org.junit.Test;
 import ch.alni.fido.uaf.authnr.tlv.CompositeTag;
 import ch.alni.fido.uaf.authnr.tlv.SingleTag;
 import ch.alni.fido.uaf.authnr.tlv.TlvStruct;
+import ch.alni.fido.uaf.authnr.tlv.UInt16;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,8 +50,8 @@ public class RecursiveDescentParserTest {
         };
 
         final TlvStruct result = parser.parse(singleTag);
-        assertThat(result.getTag()).isEqualTo(0x2E0B);
-        assertThat(result.getLength()).isEqualTo(7);
+        assertThat(result.getTag()).isEqualTo(UInt16.of(0x2E0B));
+        assertThat(result.getLengthAsInt()).isEqualTo(7);
         assertThat(result.getPosition()).isEqualTo(0);
         assertThat(result).isInstanceOf(SingleTag.class);
 
@@ -73,8 +74,8 @@ public class RecursiveDescentParserTest {
         };
 
         final TlvStruct result = parser.parse(compositeTag);
-        assertThat(result.getTag()).isEqualTo(0x3E0B);
-        assertThat(result.getLength()).isEqualTo(17);
+        assertThat(result.getTag()).isEqualTo(UInt16.of(0x3E0B));
+        assertThat(result.getLengthAsInt()).isEqualTo(17);
         assertThat(result.getPosition()).isEqualTo(0);
         assertThat(result).isInstanceOf(CompositeTag.class);
 
@@ -105,8 +106,8 @@ public class RecursiveDescentParserTest {
 
         final TlvStruct result = parser.parse(compositeTlv);
 
-        assertThat(result.getTag()).isEqualTo(0x3E0B);
-        assertThat(result.getLength()).isEqualTo(26);
+        assertThat(result.getTag()).isEqualTo(UInt16.of(0x3E0B));
+        assertThat(result.getLengthAsInt()).isEqualTo(26);
         assertThat(result.getPosition()).isEqualTo(0);
         assertThat(result).isInstanceOf(CompositeTag.class);
 

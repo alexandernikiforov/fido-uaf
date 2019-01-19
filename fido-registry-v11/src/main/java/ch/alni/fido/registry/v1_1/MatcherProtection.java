@@ -1,4 +1,4 @@
-package ch.alni.fido.uaf.protocol.v1_1;
+package ch.alni.fido.registry.v1_1;
 
 public enum MatcherProtection {
     MATCHER_PROTECTION_SOFTWARE(0x0001),
@@ -13,14 +13,6 @@ public enum MatcherProtection {
 
     public int getCode() {
         return code;
-    }
-
-    static class Serializer extends SetToIntSerializer<MatcherProtection> {
-
-        @Override
-        int setValueToInt(MatcherProtection setValue) {
-            return setValue.getCode();
-        }
     }
 
 }

@@ -1,4 +1,4 @@
-package ch.alni.fido.uaf.protocol.v1_1;
+package ch.alni.fido.registry.v1_1;
 
 public enum UserVerificationMethod {
     USER_VERIFY_PRESENCE(0x00000001),
@@ -23,10 +23,4 @@ public enum UserVerificationMethod {
         return code;
     }
 
-    static class Serializer extends SetToLongSerializer<UserVerificationMethod> {
-        @Override
-        long setValueToLong(UserVerificationMethod setValue) {
-            return setValue.getCode();
-        }
-    }
 }

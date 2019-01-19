@@ -30,12 +30,12 @@ public final class TlvStructs {
     private TlvStructs() {
     }
 
-    public static SingleTag createSingleTag(int tag, byte[] data) {
+    public static SingleTag createSingleTag(UInt16 tag, byte[] data) {
         return tlvStruct(tag, data).apply(0);
     }
 
     @SafeVarargs
-    public static CompositeTag createCompositeTag(int tag, Function<Integer, ? extends TlvStruct>... builders) {
+    public static CompositeTag createCompositeTag(UInt16 tag, Function<Integer, ? extends TlvStruct>... builders) {
         if (null == builders) {
             throw new IllegalArgumentException("at least one child TLV struct must be passed as parameter");
         }
@@ -44,7 +44,7 @@ public final class TlvStructs {
     }
 
     @SafeVarargs
-    public static Function<Integer, CompositeTag> tlvStruct(int tag, Function<Integer, ? extends TlvStruct>... builders) {
+    public static Function<Integer, CompositeTag> tlvStruct(UInt16 tag, Function<Integer, ? extends TlvStruct>... builders) {
         return position -> {
             final List<TlvStruct> tlvStructList = new ArrayList<>(builders.length);
 
@@ -53,19 +53,19 @@ public final class TlvStructs {
             for (Function<Integer, ? extends TlvStruct> builder : builders) {
                 TlvStruct tlvStruct = builder.apply(currentPosition);
                 // change position for the next tag
-                currentPosition += tlvStruct.getLength() + 4;
+                currentPosition += tlvStruct.getLengthAsInt() + 4;
                 tlvStructList.add(tlvStruct);
             }
 
-            return new CompositeTag(position, tag, currentPosition - position, tlvStructList);
+            return new CompositeTag(position, tag, UInt16.of(currentPosition - position), tlvStructList);
         };
     }
 
-    public static Function<Integer, SingleTag> tlvStruct(int tag, byte[] data) {
+    public static Function<Integer, SingleTag> tlvStruct(UInt16 tag, byte[] data) {
         if (null == data || data.length == 0) {
             throw new IllegalArgumentException("cannot create a single tag with null or empty data");
         }
 
-        return position -> new SingleTag(position, tag, data.length, data);
+        return position -> new SingleTag(position, tag, UInt16.of(data.length), data);
     }
 }

@@ -22,26 +22,32 @@ package ch.alni.fido.uaf.authnr.tlv;
  * Base class for the tags.
  */
 public abstract class TlvStruct {
-    private final int tag;
-    private final int length;
+    private final UInt16 tag;
+    private final UInt16 length;
+    private final int lengthAsInt;
 
     private final int position;
 
-    TlvStruct(int position, int tag, int length) {
+    TlvStruct(int position, UInt16 tag, UInt16 length) {
         this.tag = tag;
         this.length = length;
         this.position = position;
+        this.lengthAsInt = length.getValue();
     }
 
-    public int getTag() {
+    public UInt16 getTag() {
         return tag;
     }
 
-    public int getLength() {
-        return length;
+    public int getLengthAsInt() {
+        return lengthAsInt;
     }
 
     public int getPosition() {
         return position;
+    }
+
+    public UInt16 getLength() {
+        return length;
     }
 }

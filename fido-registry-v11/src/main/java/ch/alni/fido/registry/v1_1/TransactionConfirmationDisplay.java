@@ -1,4 +1,4 @@
-package ch.alni.fido.uaf.protocol.v1_1;
+package ch.alni.fido.registry.v1_1;
 
 public enum TransactionConfirmationDisplay {
     TRANSACTION_CONFIRMATION_DISPLAY_ANY(0x0001),
@@ -15,13 +15,6 @@ public enum TransactionConfirmationDisplay {
 
     public int getCode() {
         return code;
-    }
-
-    static class Serializer extends SetToIntSerializer<TransactionConfirmationDisplay> {
-        @Override
-        int setValueToInt(TransactionConfirmationDisplay setValue) {
-            return setValue.getCode();
-        }
     }
 
 }

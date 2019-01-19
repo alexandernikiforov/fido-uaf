@@ -31,7 +31,7 @@ public class TlvStructsTest {
 
     @Test
     public void testCreateSingleTag() {
-        final TlvStruct singleTag = TlvStructs.createSingleTag(0x2e0b, new byte[]{0x01, 0x02});
+        final TlvStruct singleTag = TlvStructs.createSingleTag(UInt16.of(0x2e0b), new byte[]{0x01, 0x02});
         assertThat(singleTag.getPosition()).isEqualTo(0);
 
         final byte[] tlvStruct = serializer.toByteArray(singleTag);
@@ -40,8 +40,8 @@ public class TlvStructsTest {
 
     @Test
     public void testCreateCompositeTag() {
-        final TlvStruct compositeTag = TlvStructs.createCompositeTag(0x3e0b,
-                TlvStructs.tlvStruct(0x2e0b, new byte[]{0x01, 0x02})
+        final TlvStruct compositeTag = TlvStructs.createCompositeTag(UInt16.of(0x3e0b),
+                TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02})
         );
 
         assertThat(compositeTag.getPosition()).isEqualTo(0);
@@ -59,13 +59,13 @@ public class TlvStructsTest {
 
     @Test
     public void testComposite() {
-        final TlvStruct tlvStruct = TlvStructs.createCompositeTag(0x3e0b,
-                TlvStructs.tlvStruct(0x3e01,
-                        TlvStructs.tlvStruct(0x2e0b, new byte[]{0x01, 0x02}),
-                        TlvStructs.tlvStruct(0x2e0b, new byte[]{0x01, 0x02})
+        final TlvStruct tlvStruct = TlvStructs.createCompositeTag(UInt16.of(0x3e0b),
+                TlvStructs.tlvStruct(UInt16.of(0x3e01),
+                        TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02}),
+                        TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02})
                 ),
-                TlvStructs.tlvStruct(0x2e0b, new byte[]{0x01, 0x02}),
-                TlvStructs.tlvStruct(0x2e0b, new byte[]{0x01, 0x02})
+                TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02}),
+                TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02})
         );
 
         parser.parse(serializer.toByteArray(tlvStruct));

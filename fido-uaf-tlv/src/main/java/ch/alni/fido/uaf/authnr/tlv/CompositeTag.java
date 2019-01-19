@@ -28,10 +28,10 @@ import java.util.List;
 public class CompositeTag extends TlvStruct {
     private final List<TlvStruct> tags = new ArrayList<>();
 
-    public CompositeTag(int position, int tag, int length, List<TlvStruct> tags) {
+    public CompositeTag(int position, UInt16 tag, UInt16 length, List<TlvStruct> tags) {
         super(position, tag, length);
 
-        if (0 == (tag & 0x1000)) {
+        if (0 == (tag.getValue() & 0x1000)) {
             throw new IllegalArgumentException("provided tag is not a composite: " + tag);
         }
 

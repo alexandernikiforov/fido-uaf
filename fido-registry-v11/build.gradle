@@ -1,0 +1,17 @@
+plugins {
+    id 'java-library'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$project.generatedJavaDir"
+        }
+    }
+}
+
+dependencies {
+    testImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
+}

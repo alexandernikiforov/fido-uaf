@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import java.util.EnumSet;
 
+import ch.alni.fido.registry.v1_1.UserVerificationMethod;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class EnumsTest {

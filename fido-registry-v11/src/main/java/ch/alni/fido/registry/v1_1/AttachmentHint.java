@@ -1,4 +1,4 @@
-package ch.alni.fido.uaf.protocol.v1_1;
+package ch.alni.fido.registry.v1_1;
 
 public enum AttachmentHint {
     ATTACHMENT_HINT_INTERNAL(0x0001),
@@ -19,13 +19,6 @@ public enum AttachmentHint {
 
     public int getCode() {
         return code;
-    }
-
-    static class Serializer extends SetToIntSerializer<AttachmentHint> {
-        @Override
-        int setValueToInt(AttachmentHint setValue) {
-            return setValue.getCode();
-        }
     }
 
 }

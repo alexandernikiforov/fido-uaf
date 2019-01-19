@@ -24,10 +24,10 @@ package ch.alni.fido.uaf.authnr.tlv;
 public class SingleTag extends TlvStruct {
     private final byte[] data;
 
-    public SingleTag(int position, int tag, int length, byte[] data) {
+    public SingleTag(int position, UInt16 tag, UInt16 length, byte[] data) {
         super(position, tag, length);
 
-        if (0 != (tag & 0x1000)) {
+        if (0 != (tag.getValue() & 0x1000)) {
             throw new IllegalArgumentException("provided tag is a composite, and not single: " + tag);
         }
 

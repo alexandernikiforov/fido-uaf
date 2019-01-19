@@ -1,4 +1,4 @@
-package ch.alni.fido.uaf.protocol.v1_1;
+package ch.alni.fido.uaf.protocol.v1_1.registry;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.util.Set;
 
-abstract class SetToIntSerializer<T> extends JsonSerializer<Set<T>> {
+abstract class SetToLongSerializer<T> extends JsonSerializer<Set<T>> {
 
     @Override
     public void serialize(Set<T> set, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        final int value = set.stream()
-                .mapToInt(this::setValueToInt)
+        final long value = set.stream()
+                .mapToLong(this::setValueToLong)
                 .reduce(0, (result, val) -> result | val);
 
         gen.writeNumber(value);
@@ -23,5 +23,5 @@ abstract class SetToIntSerializer<T> extends JsonSerializer<Set<T>> {
         return null == value || value.isEmpty();
     }
 
-    abstract int setValueToInt(T setValue);
+    abstract long setValueToLong(T setValue);
 }

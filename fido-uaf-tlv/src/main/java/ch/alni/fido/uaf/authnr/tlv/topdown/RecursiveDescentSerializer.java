@@ -22,6 +22,7 @@ import ch.alni.fido.uaf.authnr.tlv.CompositeTag;
 import ch.alni.fido.uaf.authnr.tlv.SingleTag;
 import ch.alni.fido.uaf.authnr.tlv.TlvSerializer;
 import ch.alni.fido.uaf.authnr.tlv.TlvStruct;
+import ch.alni.fido.uaf.authnr.tlv.UInt16;
 
 public class RecursiveDescentSerializer implements TlvSerializer {
 
@@ -41,7 +42,7 @@ public class RecursiveDescentSerializer implements TlvSerializer {
         private int position = 0;
 
         private byte[] serializeTlv(TlvStruct tlvStruct) {
-            buffer = new byte[tlvStruct.getLength() + 4];
+            buffer = new byte[tlvStruct.getLengthAsInt() + 4];
 
             serializeTag(tlvStruct);
 
@@ -75,11 +76,11 @@ public class RecursiveDescentSerializer implements TlvSerializer {
             position += data.length;
         }
 
-        private void writeUInt16(int uInt16Value) {
+        private void writeUInt16(UInt16 value) {
             // low
-            buffer[position++] = (byte) (uInt16Value & 0x00ff);
+            buffer[position++] = value.getLow();
             // high
-            buffer[position++] = (byte) (uInt16Value >> 8 & 0x00ff);
+            buffer[position++] = value.getHigh();
         }
     }
 }

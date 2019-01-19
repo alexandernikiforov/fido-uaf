@@ -16,22 +16,40 @@
  *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ch.alni.fido.uaf.authnr.tlv.types;
+package ch.alni.fido.uaf.authnr.tlv;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Representation of a UINT16 value.
  */
-public class UInt16 {
+public final class UInt16 {
+    public static final int MAX_UINT16 = 0xffff;
+
     private final byte low;
     private final byte high;
-
     private final int value;
 
-    public UInt16(byte low, byte high) {
+    private UInt16(byte low, byte high) {
         this.low = low;
         this.high = high;
+        this.value = (high & 0xff) << 8 | (low & 0x00ff);
+    }
 
-        this.value = high * 256 + low;
+    private UInt16(int value) {
+        this.value = value;
+        this.low = (byte) (value & 0x00ff);
+        this.high = (byte) (value >> 8 & 0x00ff);
+    }
+
+    public static UInt16 of(int value) {
+        Preconditions.checkArgument(UInts.isUInt16(value), value + " is not UINT16");
+        return new UInt16(value);
+    }
+
+    public static UInt16 of(byte low, byte high) {
+        return new UInt16(low, high);
     }
 
     public byte getLow() {
@@ -44,5 +62,22 @@ public class UInt16 {
 
     public int getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UInt16 uInt16 = (UInt16) o;
+        return value == uInt16.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value);
     }
 }

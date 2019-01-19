@@ -27,6 +27,7 @@ import ch.alni.fido.uaf.authnr.tlv.SingleTag;
 import ch.alni.fido.uaf.authnr.tlv.TlvParser;
 import ch.alni.fido.uaf.authnr.tlv.TlvParserException;
 import ch.alni.fido.uaf.authnr.tlv.TlvStruct;
+import ch.alni.fido.uaf.authnr.tlv.UInt16;
 
 /**
  * This implementation uses recursive descent to parse TLV structures.
@@ -56,8 +57,8 @@ public class RecursiveDescentParser implements TlvParser {
         private TlvStruct parseTlvStruct() {
             final int tagPosition = position;
 
-            final int tag = readUInt16();
-            final int length = readUInt16();
+            final UInt16 tag = readUInt16();
+            final UInt16 length = readUInt16();
 
             if (isComposite(tag)) {
                 return parseCompositeTagData(tagPosition, tag, length);
@@ -67,22 +68,23 @@ public class RecursiveDescentParser implements TlvParser {
             }
         }
 
-        private SingleTag parseSingleTagData(int tagPosition, int tag, int length) {
-            final byte[] data = readData(length);
+        private SingleTag parseSingleTagData(int tagPosition, UInt16 tag, UInt16 length) {
+            final byte[] data = readData(length.getValue());
             return new SingleTag(tagPosition, tag, length, data);
         }
 
-        private CompositeTag parseCompositeTagData(int tagPosition, int tag, int length) {
+        private CompositeTag parseCompositeTagData(int tagPosition, UInt16 tag, UInt16 length) {
             final List<TlvStruct> tlvStructList = new ArrayList<>();
             final int dataPosition = position;
 
             do {
                 final int nextTagPosition = position;
-                final int nextTag = readUInt16();
-                final int nextLength = readUInt16();
+                final UInt16 nextTag = readUInt16();
+                final UInt16 nextLength = readUInt16();
 
-                final int endOfTagPosition = position + nextLength;
-                if (endOfTagPosition > dataPosition + length) {
+                final int endOfTagPosition = position + nextLength.getValue();
+
+                if (endOfTagPosition > dataPosition + length.getValue()) {
                     throw new TlvParserException(dataPosition, "inconsistent length of tag");
                 }
 
@@ -95,13 +97,13 @@ public class RecursiveDescentParser implements TlvParser {
                     tlvStructList.add(singleTag);
                 }
 
-            } while (position < dataPosition + length);
+            } while (position < dataPosition + length.getValue());
 
             return new CompositeTag(tagPosition, tag, length, tlvStructList);
         }
 
-        private boolean isComposite(int tag) {
-            return (tag & 0x1000) > 0;
+        private boolean isComposite(UInt16 tag) {
+            return (tag.getValue() & 0x1000) > 0;
         }
 
         private byte[] readData(int length) {
@@ -116,7 +118,7 @@ public class RecursiveDescentParser implements TlvParser {
             return result;
         }
 
-        private int readUInt16() {
+        private UInt16 readUInt16() {
             if (position + 2 > tlvBinaryStruct.length) {
                 throw new TlvParserException(position, "unexpected end of data to read an UIN1T6 value at position " + position);
             }
@@ -124,7 +126,7 @@ public class RecursiveDescentParser implements TlvParser {
             final byte low = tlvBinaryStruct[position++];
             final byte high = tlvBinaryStruct[position++];
 
-            return (high & 0xff) << 8 | (low & 0x00ff);
+            return UInt16.of(low, high);
         }
     }
 }

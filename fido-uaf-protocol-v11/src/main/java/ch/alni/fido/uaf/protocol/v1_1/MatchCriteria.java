@@ -16,6 +16,19 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
 
+import ch.alni.fido.registry.v1_1.AttachmentHint;
+import ch.alni.fido.registry.v1_1.KeyProtection;
+import ch.alni.fido.registry.v1_1.MatcherProtection;
+import ch.alni.fido.registry.v1_1.SignatureAlgAndEncoding;
+import ch.alni.fido.registry.v1_1.TransactionConfirmationDisplay;
+import ch.alni.fido.registry.v1_1.UserVerificationMethod;
+import ch.alni.fido.uaf.protocol.v1_1.registry.AttachmentHintSerializer;
+import ch.alni.fido.uaf.protocol.v1_1.registry.AuthenticationAlgorithmDeserializer;
+import ch.alni.fido.uaf.protocol.v1_1.registry.AuthenticationAlgorithmSerializer;
+import ch.alni.fido.uaf.protocol.v1_1.registry.KeyProtectionSerializer;
+import ch.alni.fido.uaf.protocol.v1_1.registry.MatcherProtectionSerializer;
+import ch.alni.fido.uaf.protocol.v1_1.registry.UserVerificationMethodSerializer;
+
 import static ch.alni.fido.uaf.protocol.v1_1.Enums.toBitValue;
 import static ch.alni.fido.uaf.protocol.v1_1.Enums.toEnumSet;
 
@@ -61,28 +74,28 @@ public abstract class MatchCriteria {
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonSerialize(using = UserVerificationMethod.Serializer.class)
+    @JsonSerialize(using = UserVerificationMethodSerializer.class)
     public abstract ImmutableSet<UserVerificationMethod> userVerification();
 
     abstract long userVerificationAsLong();
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonSerialize(using = KeyProtection.Serializer.class)
+    @JsonSerialize(using = KeyProtectionSerializer.class)
     public abstract ImmutableSet<KeyProtection> keyProtection();
 
     abstract int keyProtectionAsInt();
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonSerialize(using = MatcherProtection.Serializer.class)
+    @JsonSerialize(using = MatcherProtectionSerializer.class)
     public abstract ImmutableSet<MatcherProtection> matcherProtection();
 
     abstract int matcherProtectionAsInt();
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonSerialize(using = AttachmentHint.Serializer.class)
+    @JsonSerialize(using = AttachmentHintSerializer.class)
     public abstract ImmutableSet<AttachmentHint> attachmentHint();
 
     abstract int attachmentHintAsInt();
@@ -95,7 +108,9 @@ public abstract class MatchCriteria {
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public abstract ImmutableList<AuthenticationAlgorithm> authenticationAlgorithms();
+    @JsonSerialize(contentUsing = AuthenticationAlgorithmSerializer.class)
+    @JsonDeserialize(contentUsing = AuthenticationAlgorithmDeserializer.class)
+    public abstract ImmutableList<SignatureAlgAndEncoding> authenticationAlgorithms();
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -156,7 +171,7 @@ public abstract class MatchCriteria {
         public abstract Builder setTcDisplay(Set<TransactionConfirmationDisplay> value);
 
         @JsonSetter
-        public abstract Builder setAuthenticationAlgorithms(List<AuthenticationAlgorithm> value);
+        public abstract Builder setAuthenticationAlgorithms(List<SignatureAlgAndEncoding> value);
 
         @JsonSetter
         public abstract Builder setAssertionSchemes(List<String> value);

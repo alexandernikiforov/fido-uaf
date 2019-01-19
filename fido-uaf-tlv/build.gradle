@@ -3,6 +3,10 @@ plugins {
 }
 
 dependencies {
+    implementation (group: 'com.google.guava', name: 'guava', version: '27.0.1-jre') {
+        transitive = false
+    }
+    
     testImplementation group: 'junit', name: 'junit', version: '4.12'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
 }

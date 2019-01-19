@@ -1,4 +1,4 @@
-package ch.alni.fido.uaf.protocol.v1_1;
+package ch.alni.fido.registry.v1_1;
 
 public enum KeyProtection {
     KEY_PROTECTION_SOFTWARE(0x0001),
@@ -15,14 +15,6 @@ public enum KeyProtection {
 
     public int getCode() {
         return code;
-    }
-
-    static class Serializer extends SetToIntSerializer<KeyProtection> {
-
-        @Override
-        int setValueToInt(KeyProtection setValue) {
-            return setValue.getCode();
-        }
     }
 
 }
