@@ -31,7 +31,7 @@ public abstract class SignedData {
     @SuppressWarnings("mutable")
     public abstract byte[] keyId();
 
-    public abstract Counters counters();
+    public abstract long signatureCounter();
 
     public abstract ImmutableList<TlvStruct> extensionData();
 
@@ -49,7 +49,7 @@ public abstract class SignedData {
 
         public abstract Builder setKeyId(byte[] keyId);
 
-        public abstract Builder setCounters(Counters value);
+        public abstract Builder setSignatureCounter(long value);
 
         public abstract Builder setExtensionData(List<TlvStruct> value);
 

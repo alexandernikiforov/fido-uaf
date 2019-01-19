@@ -20,9 +20,6 @@ package ch.alni.fido.uaf.authnr.tlv;
 
 import org.junit.Test;
 
-import ch.alni.fido.uaf.authnr.tlv.topdown.RecursiveDescentParser;
-import ch.alni.fido.uaf.authnr.tlv.topdown.RecursiveDescentSerializer;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TlvStructsTest {
@@ -31,8 +28,7 @@ public class TlvStructsTest {
 
     @Test
     public void testCreateSingleTag() {
-        final TlvStruct singleTag = TlvStructs.createSingleTag(UInt16.of(0x2e0b), new byte[]{0x01, 0x02});
-        assertThat(singleTag.getPosition()).isEqualTo(0);
+        final TlvStruct singleTag = TlvStruct.of(0x2e0b, new byte[]{0x01, 0x02});
 
         final byte[] tlvStruct = serializer.toByteArray(singleTag);
         assertThat(tlvStruct).isEqualTo(new byte[]{0x0b, 0x2e, 0x02, 0x00, 0x01, 0x02,});
@@ -40,11 +36,7 @@ public class TlvStructsTest {
 
     @Test
     public void testCreateCompositeTag() {
-        final TlvStruct compositeTag = TlvStructs.createCompositeTag(UInt16.of(0x3e0b),
-                TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02})
-        );
-
-        assertThat(compositeTag.getPosition()).isEqualTo(0);
+        final TlvStruct compositeTag = TlvStruct.of(0x3e0b, TlvStruct.of(0x2e0b, new byte[]{0x01, 0x02}));
 
         final byte[] tlvStruct = serializer.toByteArray(compositeTag);
         assertThat(tlvStruct).isEqualTo(new byte[]{
@@ -59,13 +51,13 @@ public class TlvStructsTest {
 
     @Test
     public void testComposite() {
-        final TlvStruct tlvStruct = TlvStructs.createCompositeTag(UInt16.of(0x3e0b),
-                TlvStructs.tlvStruct(UInt16.of(0x3e01),
-                        TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02}),
-                        TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02})
+        final TlvStruct tlvStruct = TlvStruct.of(0x3e0b,
+                TlvStruct.of(0x3e01,
+                        TlvStruct.of(0x2e0b, new byte[]{0x01, 0x02}),
+                        TlvStruct.of(0x2e0b, new byte[]{0x01, 0x02})
                 ),
-                TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02}),
-                TlvStructs.tlvStruct(UInt16.of(0x2e0b), new byte[]{0x01, 0x02})
+                TlvStruct.of(0x2e0b, new byte[]{0x01, 0x02}),
+                TlvStruct.of(0x2e0b, new byte[]{0x01, 0x02})
         );
 
         parser.parse(serializer.toByteArray(tlvStruct));

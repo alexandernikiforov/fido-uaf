@@ -16,14 +16,9 @@
  *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ch.alni.fido.uaf.authnr.tlv.topdown;
+package ch.alni.fido.uaf.authnr.tlv;
 
 import org.junit.Test;
-
-import ch.alni.fido.uaf.authnr.tlv.CompositeTag;
-import ch.alni.fido.uaf.authnr.tlv.SingleTag;
-import ch.alni.fido.uaf.authnr.tlv.TlvStruct;
-import ch.alni.fido.uaf.authnr.tlv.UInt16;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,10 +45,9 @@ public class RecursiveDescentParserTest {
         };
 
         final TlvStruct result = parser.parse(singleTag);
-        assertThat(result.getTag()).isEqualTo(UInt16.of(0x2E0B));
-        assertThat(result.getLengthAsInt()).isEqualTo(7);
-        assertThat(result.getPosition()).isEqualTo(0);
-        assertThat(result).isInstanceOf(SingleTag.class);
+        assertThat(result.tag()).isEqualTo(UInt16.of(0x2E0B));
+        assertThat(result.lengthAsInt()).isEqualTo(7);
+        assertThat(result.composite()).isFalse();
 
         assertThat(serializer.toByteArray(result)).isEqualTo(singleTag);
     }
@@ -74,10 +68,9 @@ public class RecursiveDescentParserTest {
         };
 
         final TlvStruct result = parser.parse(compositeTag);
-        assertThat(result.getTag()).isEqualTo(UInt16.of(0x3E0B));
-        assertThat(result.getLengthAsInt()).isEqualTo(17);
-        assertThat(result.getPosition()).isEqualTo(0);
-        assertThat(result).isInstanceOf(CompositeTag.class);
+        assertThat(result.tag()).isEqualTo(UInt16.of(0x3E0B));
+        assertThat(result.lengthAsInt()).isEqualTo(17);
+        assertThat(result.composite()).isTrue();
 
         assertThat(serializer.toByteArray(result)).isEqualTo(compositeTag);
     }
@@ -106,15 +99,13 @@ public class RecursiveDescentParserTest {
 
         final TlvStruct result = parser.parse(compositeTlv);
 
-        assertThat(result.getTag()).isEqualTo(UInt16.of(0x3E0B));
-        assertThat(result.getLengthAsInt()).isEqualTo(26);
-        assertThat(result.getPosition()).isEqualTo(0);
-        assertThat(result).isInstanceOf(CompositeTag.class);
+        assertThat(result.tag()).isEqualTo(UInt16.of(0x3E0B));
+        assertThat(result.lengthAsInt()).isEqualTo(26);
+        assertThat(result.composite()).isTrue();
 
-        final CompositeTag compositeTag = (CompositeTag) result;
-        assertThat(compositeTag.getTags()).hasSize(2);
-        assertThat(compositeTag.getTags().get(0)).isInstanceOf(CompositeTag.class);
-        assertThat(compositeTag.getTags().get(1)).isInstanceOf(SingleTag.class);
+        assertThat(result.tags()).hasSize(2);
+        assertThat(result.tags().get(0).composite()).isTrue();
+        assertThat(result.tags().get(1).composite()).isFalse();
 
         // check if we can restore the original array
         assertThat(serializer.toByteArray(result)).isEqualTo(compositeTlv);

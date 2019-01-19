@@ -18,36 +18,97 @@
 
 package ch.alni.fido.uaf.authnr.tlv;
 
-/**
- * Base class for the tags.
- */
+import com.google.auto.value.AutoValue;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+@AutoValue
 public abstract class TlvStruct {
-    private final UInt16 tag;
-    private final UInt16 length;
-    private final int lengthAsInt;
-
-    private final int position;
-
-    TlvStruct(int position, UInt16 tag, UInt16 length) {
-        this.tag = tag;
-        this.length = length;
-        this.position = position;
-        this.lengthAsInt = length.getValue();
+    static Builder builder() {
+        return new AutoValue_TlvStruct.Builder()
+                .setTags(ImmutableList.of());
     }
 
-    public UInt16 getTag() {
-        return tag;
+    public static TlvStruct of(int tag, byte[] data) {
+        return builder()
+                .setTag(UInt16.of(tag))
+                .setLength(UInt16.of(null == data ? 0 : data.length))
+                .setComposite(false)
+                .setData(UInt8Array.of(data))
+                .build();
     }
 
-    public int getLengthAsInt() {
-        return lengthAsInt;
+    public static TlvStruct of(int tag, TlvStruct... tags) {
+        final int length = Stream.of(tags)
+                .map(TlvStruct::lengthAsInt)
+                .reduce(0, (result, value) -> 4 + result + value);
+
+        return builder()
+                .setTag(UInt16.of(tag))
+                .setLength(UInt16.of(length))
+                .setComposite(true)
+                .setTags(Arrays.asList(tags))
+                .build();
     }
 
-    public int getPosition() {
-        return position;
-    }
+    public abstract UInt16 tag();
 
-    public UInt16 getLength() {
-        return length;
+    public abstract UInt16 length();
+
+    public abstract int lengthAsInt();
+
+    public abstract boolean composite();
+
+    public abstract Optional<UInt8Array> data();
+
+    public abstract ImmutableList<TlvStruct> tags();
+
+    @AutoValue.Builder
+    abstract static class Builder {
+        abstract Builder setTag(UInt16 value);
+
+        abstract Builder setLength(UInt16 value);
+
+        abstract Builder setLengthAsInt(int length);
+
+        abstract Builder setComposite(boolean value);
+
+        abstract UInt16 length();
+
+        abstract Builder setData(UInt8Array data);
+
+        abstract Builder setTags(List<TlvStruct> tags);
+
+        abstract TlvStruct autoBuild();
+
+        TlvStruct build() {
+            if (null != length()) {
+                setLengthAsInt(length().getValue());
+            }
+
+            final TlvStruct tlvStruct = autoBuild();
+
+            Preconditions.checkArgument(tlvStruct.tag().getValue() <= 0x3FFF, "" +
+                    "only the first 14 bits should be used in tags to accommodate the limitations of some hardware platforms");
+
+            final boolean dataPresent = tlvStruct.data().isPresent();
+            final boolean tagsEmpty = tlvStruct.tags().isEmpty();
+
+            Preconditions.checkArgument((dataPresent && tagsEmpty) || !dataPresent && !tagsEmpty,
+                    "either tags or data must be present");
+
+            if (tlvStruct.composite()) {
+                Preconditions.checkArgument(!tagsEmpty, "a composite tag must contain tags");
+                Preconditions.checkArgument((tlvStruct.tag().getValue() & 0x1000) > 0,
+                        "a composite tag must be recursive");
+            }
+
+            return tlvStruct;
+        }
     }
 }

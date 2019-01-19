@@ -13,4 +13,8 @@ public final class UInts {
         return value >= 0 && value <= UInt8.MAX_UINT8;
     }
 
+    public static boolean isUInt32(long value) {
+        return value >= 0 && value <= UInt32.MAX_UINT32;
+    }
+
 }

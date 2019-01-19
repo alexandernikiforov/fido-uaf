@@ -16,13 +16,7 @@
  *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ch.alni.fido.uaf.authnr.tlv.topdown;
-
-import ch.alni.fido.uaf.authnr.tlv.CompositeTag;
-import ch.alni.fido.uaf.authnr.tlv.SingleTag;
-import ch.alni.fido.uaf.authnr.tlv.TlvSerializer;
-import ch.alni.fido.uaf.authnr.tlv.TlvStruct;
-import ch.alni.fido.uaf.authnr.tlv.UInt16;
+package ch.alni.fido.uaf.authnr.tlv;
 
 public class RecursiveDescentSerializer implements TlvSerializer {
 
@@ -42,7 +36,7 @@ public class RecursiveDescentSerializer implements TlvSerializer {
         private int position = 0;
 
         private byte[] serializeTlv(TlvStruct tlvStruct) {
-            buffer = new byte[tlvStruct.getLengthAsInt() + 4];
+            buffer = new byte[tlvStruct.lengthAsInt() + 4];
 
             serializeTag(tlvStruct);
 
@@ -50,28 +44,28 @@ public class RecursiveDescentSerializer implements TlvSerializer {
         }
 
         private void serializeTag(TlvStruct tlvStruct) {
-            if (tlvStruct instanceof CompositeTag) {
-                serializeCompositeTag((CompositeTag) tlvStruct);
+            if (tlvStruct.composite()) {
+                serializeCompositeTag(tlvStruct);
             }
             else {
-                serializeSingleTag((SingleTag) tlvStruct);
+                serializeSingleTag(tlvStruct);
             }
         }
 
-        private void serializeCompositeTag(CompositeTag compositeTag) {
-            writeUInt16(compositeTag.getTag());
-            writeUInt16(compositeTag.getLength());
-
-            compositeTag.getTags().forEach(this::serializeTag);
+        private void serializeCompositeTag(TlvStruct compositeTag) {
+            writeUInt16(compositeTag.tag());
+            writeUInt16(compositeTag.length());
+            compositeTag.tags().forEach(this::serializeTag);
         }
 
-        private void serializeSingleTag(SingleTag tlvStruct) {
-            writeUInt16(tlvStruct.getTag());
-            writeUInt16(tlvStruct.getLength());
-            writeData(tlvStruct.getData());
+        private void serializeSingleTag(TlvStruct tlvStruct) {
+            writeUInt16(tlvStruct.tag());
+            writeUInt16(tlvStruct.length());
+            tlvStruct.data().ifPresent(this::writeData);
         }
 
-        private void writeData(byte[] data) {
+        private void writeData(UInt8Array uInt8Array) {
+            byte[] data = uInt8Array.getData();
             System.arraycopy(data, 0, buffer, position, data.length);
             position += data.length;
         }
