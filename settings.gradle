@@ -2,6 +2,6 @@ rootProject.name = 'fido-uaf'
 
 include 'fido-uaf-tlv'
 include 'fido-uaf-protocol-v11'
-include 'fido-uaf-assertions-11'
+include 'fido-uaf-assertions-v11'
 include 'fido-registry-v11'
 
