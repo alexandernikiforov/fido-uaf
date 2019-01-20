@@ -22,13 +22,15 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 @AutoValue
 public abstract class TlvStruct {
+
+    private static final int TAG_HEADER_LENGTH = 4;
+
     static Builder builder() {
         return new AutoValue_TlvStruct.Builder()
                 .setTags(ImmutableList.of());
@@ -43,18 +45,65 @@ public abstract class TlvStruct {
                 .build();
     }
 
-    public static TlvStruct of(int tag, TlvStruct... tags) {
-        final int length = Stream.of(tags)
-                .map(TlvStruct::lengthAsInt)
-                .reduce(0, (result, value) -> 4 + result + value);
+    public static TlvStruct of(int tag, TlvStruct first, TlvStruct... rest) {
+        Preconditions.checkNotNull(first, "at least one tag must be not null");
+
+        final int length = computeLength(first, rest);
+
+        final ImmutableList<TlvStruct> tags = null == rest ?
+                new ImmutableList.Builder<TlvStruct>().add(first).build() :
+                new ImmutableList.Builder<TlvStruct>().add(first).add(rest).build();
 
         return builder()
                 .setTag(UInt16.of(tag))
                 .setLength(UInt16.of(length))
                 .setComposite(true)
-                .setTags(Arrays.asList(tags))
+                .setTags(tags)
                 .build();
     }
+
+    /**
+     * Builds a non-recursive tag.
+     *
+     * @param tag   the tag ID
+     * @param first first part of the tag values
+     * @param rest  the rest of the tag values (can be empty)
+     * @return a non-recursive TLV structure containing the tag values in the data section in the order in which they
+     * are provided as parameters to this method
+     */
+    public static TlvStruct of(int tag, TagValue first, TagValue... rest) {
+        Preconditions.checkNotNull(first, "at least one tag value must be provided");
+
+        // compute the length
+        final int length = null == rest ? first.length() :
+                Stream.of(rest)
+                        .mapToInt(TagValue::length)
+                        .reduce(first.length(), (result, value) -> result + value);
+
+        // build an array from the data
+        final byte[] data = new byte[length];
+
+        // copy first
+        System.arraycopy(first.toByteArray(), 0, data, 0, first.length());
+
+        // copy rest
+        if (null != rest) {
+            int pos = first.length(); // start after the first tag
+            for (TagValue tagValue : rest) {
+                System.arraycopy(tagValue.toByteArray(), 0, data, pos, tagValue.length());
+                // move the pointer
+                pos += tagValue.length();
+            }
+        }
+
+        return builder()
+                .setTag(UInt16.of(tag))
+                .setLength(UInt16.of(length))
+                .setComposite(false)
+                .setData(UInt8Array.of(data))
+                .build();
+    }
+
 
     public abstract UInt16 tag();
 
@@ -67,6 +116,46 @@ public abstract class TlvStruct {
     public abstract Optional<UInt8Array> data();
 
     public abstract ImmutableList<TlvStruct> tags();
+
+    /**
+     * Returns a new TLV structure that is result of appending the parameter tags to the tags of the TLV structure
+     * provided as the first parameter. This method can be called on for composite tags.
+     */
+    public static TlvStruct extend(TlvStruct tlvStruct, List<TlvStruct> tlvStructs) {
+        Preconditions.checkNotNull(tlvStruct, "TLV structure to be extended must not be null");
+        Preconditions.checkState(tlvStruct.composite(), "cannot append TLV tags to a non-composite tag");
+
+        if (tlvStructs.isEmpty()) {
+            return tlvStruct;
+        }
+
+        // compute the length
+        final int length = tlvStruct.lengthAsInt() + tlvStructs.stream()
+                .mapToInt(TlvStruct::lengthAsInt)
+                .reduce(0, (result, value) -> TAG_HEADER_LENGTH + result + value);
+
+        final ImmutableList<TlvStruct> tags = new ImmutableList.Builder<TlvStruct>()
+                .addAll(tlvStruct.tags())
+                .addAll(tlvStructs)
+                .build();
+
+        return tlvStruct.toBuilder()
+                .setLength(UInt16.of(length))
+                .setTags(tags)
+                .build();
+    }
+
+    private static int computeLength(TlvStruct first, TlvStruct[] rest) {
+        return null == rest ? TAG_HEADER_LENGTH + first.lengthAsInt() :
+                Stream.of(rest)
+                        .mapToInt(TlvStruct::lengthAsInt)
+                        .reduce(
+                                TAG_HEADER_LENGTH + first.lengthAsInt(),
+                                (result, value) -> TAG_HEADER_LENGTH + result + value
+                        );
+    }
+
+    public abstract Builder toBuilder();
 
     @AutoValue.Builder
     abstract static class Builder {

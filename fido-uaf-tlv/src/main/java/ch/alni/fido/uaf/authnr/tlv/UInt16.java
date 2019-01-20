@@ -24,7 +24,7 @@ import com.google.common.base.Preconditions;
 /**
  * Representation of a UINT16 value.
  */
-public final class UInt16 {
+public final class UInt16 implements TagValue {
     public static final int MAX_UINT16 = 0xffff;
 
     private final byte low;
@@ -79,5 +79,15 @@ public final class UInt16 {
     @Override
     public int hashCode() {
         return Objects.hashCode(value);
+    }
+
+    @Override
+    public int length() {
+        return 2;
+    }
+
+    @Override
+    public byte[] toByteArray() {
+        return new byte[]{low, high};
     }
 }

@@ -24,7 +24,7 @@ import com.google.common.base.Preconditions;
 /**
  * Representation of a UINT16 value.
  */
-public final class UInt32 {
+public final class UInt32 implements TagValue {
     public static final long MAX_UINT32 = 0x7fffffff;
 
     private final byte byte0;
@@ -43,7 +43,7 @@ public final class UInt32 {
         this.value = (byte3 & 0xff) << 24 | (byte2 & 0x00ff) << 16 | (byte1 & 0xff) << 8 | (byte0 & 0x00ff);
     }
 
-    private UInt32(int value) {
+    private UInt32(long value) {
         this.value = value;
         this.byte0 = (byte) (value & 0x00ff);
         this.byte1 = (byte) (value >> 8 & 0x00ff);
@@ -51,7 +51,7 @@ public final class UInt32 {
         this.byte3 = (byte) (value >> 24 & 0x00ff);
     }
 
-    public static UInt32 of(int value) {
+    public static UInt32 of(long value) {
         Preconditions.checkArgument(UInts.isUInt32(value), value + " is not UINT32");
         return new UInt32(value);
     }
@@ -96,5 +96,15 @@ public final class UInt32 {
     @Override
     public int hashCode() {
         return Objects.hashCode(value);
+    }
+
+    @Override
+    public int length() {
+        return 4;
+    }
+
+    @Override
+    public byte[] toByteArray() {
+        return new byte[]{byte0, byte1, byte2, byte3};
     }
 }

@@ -65,7 +65,7 @@ public class RecursiveDescentSerializer implements TlvSerializer {
         }
 
         private void writeData(UInt8Array uInt8Array) {
-            byte[] data = uInt8Array.getData();
+            byte[] data = uInt8Array.toByteArray();
             System.arraycopy(data, 0, buffer, position, data.length);
             position += data.length;
         }

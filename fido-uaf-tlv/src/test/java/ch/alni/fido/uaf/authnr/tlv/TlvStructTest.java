@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TlvStructsTest {
+public class TlvStructTest {
     private final RecursiveDescentSerializer serializer = new RecursiveDescentSerializer();
     private final RecursiveDescentParser parser = new RecursiveDescentParser();
 
@@ -60,6 +60,9 @@ public class TlvStructsTest {
                 TlvStruct.of(0x2e0b, new byte[]{0x01, 0x02})
         );
 
+        assertThat(tlvStruct.lengthAsInt()).isEqualTo(28);
+        assertThat(tlvStruct.tags()).hasSize(3);
         parser.parse(serializer.toByteArray(tlvStruct));
     }
+
 }

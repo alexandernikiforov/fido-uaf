@@ -4,7 +4,10 @@ import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
 
-public final class UInt8Array {
+/**
+ * Immutable wrapper around byte array data.
+ */
+public final class UInt8Array implements TagValue {
 
     private final byte[] data;
 
@@ -19,20 +22,16 @@ public final class UInt8Array {
     }
 
     public static UInt8Array of(byte[] data) {
-        Preconditions.checkArgument(null != data && data.length > 0, "data cannot be null or empty");
+        Preconditions.checkArgument(null != data, "data cannot be null");
         return new UInt8Array(data);
     }
 
     public static UInt8Array of(byte[] data, int pos, int length) {
-        Preconditions.checkArgument(null != data && data.length > 0, "data cannot be null or empty");
+        Preconditions.checkArgument(null != data, "data cannot be null");
         Preconditions.checkArgument(pos >= 0, "position must be non negative");
         Preconditions.checkArgument(length > 0, "length must be positive");
         Preconditions.checkArgument(length + pos <= data.length, "cannot read more data than given");
         return new UInt8Array(data, pos, length);
-    }
-
-    public byte[] getData() {
-        return Arrays.copyOf(data, data.length);
     }
 
     @Override
@@ -51,4 +50,15 @@ public final class UInt8Array {
     public int hashCode() {
         return Arrays.hashCode(data);
     }
+
+    @Override
+    public int length() {
+        return data.length;
+    }
+
+    @Override
+    public byte[] toByteArray() {
+        return Arrays.copyOf(data, data.length);
+    }
+
 }
