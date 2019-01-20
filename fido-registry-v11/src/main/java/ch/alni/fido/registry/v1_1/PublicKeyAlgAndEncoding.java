@@ -8,10 +8,10 @@ import java.util.stream.Stream;
 
 public enum PublicKeyAlgAndEncoding {
 
-    ALG_KEY_ECC_X962_RAW(0x0100),
-    ALG_KEY_ECC_X962_DER(0x0101),
-    ALG_KEY_RSA_2048_RAW(0x0102),
-    ALG_KEY_RSA_2048_DER(0x0103);
+    ALG_KEY_ECC_X962_RAW(0x0100, "EC"),
+    ALG_KEY_ECC_X962_DER(0x0101, "EC"),
+    ALG_KEY_RSA_2048_RAW(0x0102, "RSA"),
+    ALG_KEY_RSA_2048_DER(0x0103, "RSA");
 
     private final static Map<Integer, PublicKeyAlgAndEncoding> VALUE_MAP =
             Stream.of(values()).collect(Collectors.toMap(
@@ -19,9 +19,11 @@ public enum PublicKeyAlgAndEncoding {
                     Function.identity()
             ));
     private final int code;
+    private final String algorithm;
 
-    PublicKeyAlgAndEncoding(int code) {
+    PublicKeyAlgAndEncoding(int code, String algorithm) {
         this.code = code;
+        this.algorithm = algorithm;
     }
 
     public static PublicKeyAlgAndEncoding fromCode(int code) {
@@ -31,5 +33,9 @@ public enum PublicKeyAlgAndEncoding {
 
     public int getCode() {
         return code;
+    }
+
+    public String getAlgorithm() {
+        return algorithm;
     }
 }

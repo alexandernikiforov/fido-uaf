@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import java.nio.charset.StandardCharsets;
-import java.security.PublicKey;
 import java.util.List;
 
 import ch.alni.fido.registry.v1_1.PublicKeyAlgAndEncoding;
@@ -74,10 +73,16 @@ public abstract class KeyRegistrationData {
                     tlvStruct.data().ifPresent(uInt8Array -> {
                                 final byte[] data = uInt8Array.toByteArray();
                                 Preconditions.checkArgument(data.length == 8,
-                                        "invalid length of data (%d) for tag TAG_COUNTERS(%d)", data.length, tag);
+                                        "Invalid length of data (%d) for tag TAG_COUNTERS(%d)", data.length, tag);
                                 builder.setSignatureCounter(UInt32.of(data[0], data[1], data[2], data[3]).getValue());
                                 builder.setRegistrationCounter(UInt32.of(data[4], data[5], data[6], data[7]).getValue());
                             }
+                    );
+                    break;
+                case Tags.TAG_PUB_KEY:
+                    Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_PUB_KEY(%d)", tag);
+                    tlvStruct.data().ifPresent(uInt8Array ->
+                            builder.setUserAuthPubKey(uInt8Array.toByteArray())
                     );
                     break;
                 case Tags.TAG_EXTENSION:
@@ -108,7 +113,8 @@ public abstract class KeyRegistrationData {
 
     public abstract long signatureCounter();
 
-    public abstract PublicKey userAuthPubKey();
+    @SuppressWarnings("mutable")
+    public abstract byte[] userAuthPubKey();
 
     public abstract long registrationCounter();
 
@@ -134,7 +140,7 @@ public abstract class KeyRegistrationData {
                         UInt32.of(signatureCounter()),
                         UInt32.of(registrationCounter())
                 ),
-                TlvStruct.of(Tags.TAG_PUB_KEY, userAuthPubKey().getEncoded())
+                TlvStruct.of(Tags.TAG_PUB_KEY, userAuthPubKey())
         );
 
         return TlvStruct.extend(result, Extension.toTlvStructList(extensions()));
@@ -160,7 +166,7 @@ public abstract class KeyRegistrationData {
 
         public abstract Builder setRegistrationCounter(long value);
 
-        public abstract Builder setUserAuthPubKey(PublicKey value);
+        public abstract Builder setUserAuthPubKey(byte[] value);
 
         public abstract Builder setExtensions(List<Extension> value);
 
