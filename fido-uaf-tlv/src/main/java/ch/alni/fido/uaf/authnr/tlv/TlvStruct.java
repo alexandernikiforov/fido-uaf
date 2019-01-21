@@ -22,6 +22,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -34,6 +35,16 @@ public abstract class TlvStruct {
     static Builder builder() {
         return new AutoValue_TlvStruct.Builder()
                 .setTags(ImmutableList.of());
+    }
+
+    /**
+     * Creates a TLV structure from the supplied data.
+     *
+     * @throws TlvParserException if the given data cannot be parsed properly
+     */
+    public static TlvStruct of(byte[] data) {
+        Preconditions.checkArgument(null != data && data.length > 0, "data cannot be null or empty");
+        return new RecursiveDescentParser().parse(data);
     }
 
     /**
@@ -145,6 +156,21 @@ public abstract class TlvStruct {
     public abstract int length();
 
     public abstract Optional<ImmutableByteArray> data();
+
+    /**
+     * Serializes itself to a byte array.
+     */
+    public final byte[] toByteArray() {
+        return new RecursiveDescentSerializer().toByteArray(this);
+    }
+
+    /**
+     * Serializes itself to a Base64Url encoded string.
+     */
+    public final String toBase64UrlEncoded() {
+        final byte[] byteArray = new RecursiveDescentSerializer().toByteArray(this);
+        return Base64.getUrlEncoder().encodeToString(byteArray);
+    }
 
     abstract Builder toBuilder();
 
