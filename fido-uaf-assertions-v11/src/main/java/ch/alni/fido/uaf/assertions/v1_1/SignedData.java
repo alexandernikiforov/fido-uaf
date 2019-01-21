@@ -27,7 +27,7 @@ public abstract class SignedData {
     public static SignedData of(TlvStruct signedDataStruct) {
         final int signedDataTag = signedDataStruct.tag();
         Preconditions.checkArgument(signedDataTag == Tags.TAG_UAFV1_SIGNED_DATA,
-                "Unexpected signedDataTag value %d", signedDataTag);
+                "Unexpected signedDataTag value %s", signedDataTag);
 
         final SignedData.Builder builder = SignedData.builder();
         for (TlvStruct tlvStruct : signedDataStruct.tags()) {

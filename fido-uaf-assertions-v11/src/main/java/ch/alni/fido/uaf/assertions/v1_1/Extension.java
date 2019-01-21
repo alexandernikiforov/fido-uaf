@@ -31,7 +31,7 @@ public abstract class Extension {
     public static Extension of(TlvStruct extTlvStruct) {
         final int extTag = extTlvStruct.tag();
         Preconditions.checkArgument(extTag == Tags.TAG_EXTENSION || extTag == Tags.TAG_EXTENSION_CRITICAL,
-                "Invalid extension tag %d", extTag);
+                "Invalid extension tag %s", extTag);
 
         Preconditions.checkArgument(extTlvStruct.tags().size() == 2, "Invalid size of the extension tag");
 
@@ -41,16 +41,17 @@ public abstract class Extension {
 
             switch (tag) {
                 case Tags.TAG_EXTENSION_ID:
-                    Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_EXTENSION_ID(%d)", tag);
+                    Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_EXTENSION_ID(%s)", tag);
                     tlvStruct.data().ifPresent(uInt8Array ->
                             builder.setExtensionId(uInt8Array.toByteArray())
                     );
                     break;
                 case Tags.TAG_EXTENSION_DATA:
-                    Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_EXTENSION_DATA(%d)", tag);
+                    Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_EXTENSION_DATA(%s)", tag);
                     tlvStruct.data().ifPresent(uInt8Array ->
                             builder.setExtensionData(uInt8Array.toByteArray())
                     );
+                    break;
                 default:
                     throw new IllegalArgumentException("Unexpected tag " + tag);
             }

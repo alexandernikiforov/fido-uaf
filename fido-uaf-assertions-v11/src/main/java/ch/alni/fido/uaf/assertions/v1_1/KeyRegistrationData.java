@@ -27,7 +27,8 @@ public abstract class KeyRegistrationData {
 
     public static KeyRegistrationData of(TlvStruct krd) {
         final int krdTag = krd.tag();
-        Preconditions.checkArgument(krdTag == Tags.TAG_UAFV1_SIGNED_DATA, "Unexpected value %d", krdTag);
+        Preconditions.checkArgument(krdTag == Tags.TAG_UAFV1_KRD,
+                "Unexpected tag %s, expected TAG_UAFV1_KRD (%s)", krdTag, Tags.TAG_UAFV1_KRD);
 
         final Builder builder = builder();
         for (TlvStruct tlvStruct : krd.tags()) {
