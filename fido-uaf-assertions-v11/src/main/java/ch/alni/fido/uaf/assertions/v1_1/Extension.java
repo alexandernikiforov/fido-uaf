@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ch.alni.fido.uaf.authnr.tlv.TlvStruct;
+import ch.alni.fido.uaf.authnr.tlv.UInt8Array;
 import ch.alni.fido.uaf.registry.v1_1.Tags;
 
 @AutoValue
@@ -20,15 +21,15 @@ public abstract class Extension {
         return new ImmutableList.Builder<TlvStruct>()
                 .addAll(extensionList.stream()
                         .map(extension -> TlvStruct.of(extension.critical() ? Tags.TAG_EXTENSION_CRITICAL : Tags.TAG_EXTENSION,
-                                TlvStruct.of(Tags.TAG_EXTENSION_ID, extension.extensionId()),
-                                TlvStruct.of(Tags.TAG_EXTENSION_DATA, extension.extensionData())
+                                TlvStruct.of(Tags.TAG_EXTENSION_ID, UInt8Array.of(extension.extensionId())),
+                                TlvStruct.of(Tags.TAG_EXTENSION_DATA, UInt8Array.of(extension.extensionData()))
                         ))
                         .collect(Collectors.toList()))
                 .build();
     }
 
     public static Extension of(TlvStruct extTlvStruct) {
-        final int extTag = extTlvStruct.tag().getValue();
+        final int extTag = extTlvStruct.tag();
         Preconditions.checkArgument(extTag == Tags.TAG_EXTENSION || extTag == Tags.TAG_EXTENSION_CRITICAL,
                 "Invalid extension tag %d", extTag);
 
@@ -36,7 +37,7 @@ public abstract class Extension {
 
         final Extension.Builder builder = Extension.builder();
         for (TlvStruct tlvStruct : extTlvStruct.tags()) {
-            final int tag = tlvStruct.tag().getValue();
+            final int tag = tlvStruct.tag();
 
             switch (tag) {
                 case Tags.TAG_EXTENSION_ID:

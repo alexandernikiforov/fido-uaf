@@ -45,8 +45,8 @@ public class RecursiveDescentParserTest {
         };
 
         final TlvStruct result = parser.parse(singleTag);
-        assertThat(result.tag()).isEqualTo(UInt16.of(0x2E0B));
-        assertThat(result.lengthAsInt()).isEqualTo(7);
+        assertThat(result.tag()).isEqualTo(0x2E0B);
+        assertThat(result.length()).isEqualTo(7);
         assertThat(result.composite()).isFalse();
 
         assertThat(serializer.toByteArray(result)).isEqualTo(singleTag);
@@ -68,8 +68,8 @@ public class RecursiveDescentParserTest {
         };
 
         final TlvStruct result = parser.parse(compositeTag);
-        assertThat(result.tag()).isEqualTo(UInt16.of(0x3E0B));
-        assertThat(result.lengthAsInt()).isEqualTo(17);
+        assertThat(result.tag()).isEqualTo(0x3E0B);
+        assertThat(result.length()).isEqualTo(17);
         assertThat(result.composite()).isTrue();
 
         assertThat(serializer.toByteArray(result)).isEqualTo(compositeTag);
@@ -99,8 +99,8 @@ public class RecursiveDescentParserTest {
 
         final TlvStruct result = parser.parse(compositeTlv);
 
-        assertThat(result.tag()).isEqualTo(UInt16.of(0x3E0B));
-        assertThat(result.lengthAsInt()).isEqualTo(26);
+        assertThat(result.tag()).isEqualTo(0x3E0B);
+        assertThat(result.length()).isEqualTo(26);
         assertThat(result.composite()).isTrue();
 
         assertThat(result.tags()).hasSize(2);

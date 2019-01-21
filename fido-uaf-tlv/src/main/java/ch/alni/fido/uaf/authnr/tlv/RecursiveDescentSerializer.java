@@ -36,7 +36,7 @@ public class RecursiveDescentSerializer implements TlvSerializer {
         private int position = 0;
 
         private byte[] serializeTlv(TlvStruct tlvStruct) {
-            buffer = new byte[tlvStruct.lengthAsInt() + 4];
+            buffer = new byte[tlvStruct.length() + 4];
 
             serializeTag(tlvStruct);
 
@@ -64,17 +64,18 @@ public class RecursiveDescentSerializer implements TlvSerializer {
             tlvStruct.data().ifPresent(this::writeData);
         }
 
-        private void writeData(UInt8Array uInt8Array) {
+        private void writeData(ImmutableByteArray uInt8Array) {
             byte[] data = uInt8Array.toByteArray();
             System.arraycopy(data, 0, buffer, position, data.length);
             position += data.length;
         }
 
-        private void writeUInt16(UInt16 value) {
+        private void writeUInt16(int value) {
+            final UInt16 uInt16 = UInt16.of(value);
             // low
-            buffer[position++] = value.getLow();
+            buffer[position++] = uInt16.getLow();
             // high
-            buffer[position++] = value.getHigh();
+            buffer[position++] = uInt16.getHigh();
         }
     }
 }

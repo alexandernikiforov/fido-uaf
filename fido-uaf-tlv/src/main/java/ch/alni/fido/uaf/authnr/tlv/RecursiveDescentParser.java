@@ -48,8 +48,8 @@ public class RecursiveDescentParser implements TlvParser {
         }
 
         private TlvStruct parseTlvStruct() {
-            final UInt16 tag = readUInt16();
-            final UInt16 length = readUInt16();
+            final int tag = readUInt16();
+            final int length = readUInt16();
 
             if (isComposite(tag)) {
                 return parseCompositeTagData(tag, length);
@@ -59,8 +59,8 @@ public class RecursiveDescentParser implements TlvParser {
             }
         }
 
-        private TlvStruct parseSingleTagData(UInt16 tag, UInt16 length) {
-            final UInt8Array data = readData(length.getValue());
+        private TlvStruct parseSingleTagData(int tag, int length) {
+            final ImmutableByteArray data = readData(length);
             return TlvStruct.builder()
                     .setTag(tag)
                     .setLength(length)
@@ -69,17 +69,17 @@ public class RecursiveDescentParser implements TlvParser {
                     .build();
         }
 
-        private TlvStruct parseCompositeTagData(UInt16 tag, UInt16 length) {
+        private TlvStruct parseCompositeTagData(int tag, int length) {
             final List<TlvStruct> tlvStructList = new ArrayList<>();
             final int dataPosition = position;
 
             do {
-                final UInt16 nextTag = readUInt16();
-                final UInt16 nextLength = readUInt16();
+                final int nextTag = readUInt16();
+                final int nextLength = readUInt16();
 
-                final int endOfTagPosition = position + nextLength.getValue();
+                final int endOfTagPosition = position + nextLength;
 
-                if (endOfTagPosition > dataPosition + length.getValue()) {
+                if (endOfTagPosition > dataPosition + length) {
                     throw new TlvParserException(dataPosition, "inconsistent length of tag");
                 }
 
@@ -92,7 +92,7 @@ public class RecursiveDescentParser implements TlvParser {
                     tlvStructList.add(singleTag);
                 }
 
-            } while (position < dataPosition + length.getValue());
+            } while (position < dataPosition + length);
 
             return TlvStruct.builder()
                     .setTag(tag)
@@ -102,23 +102,23 @@ public class RecursiveDescentParser implements TlvParser {
                     .build();
         }
 
-        private boolean isComposite(UInt16 tag) {
-            return (tag.getValue() & 0x1000) > 0;
+        private boolean isComposite(int tag) {
+            return (tag & 0x1000) > 0;
         }
 
-        private UInt8Array readData(int length) {
+        private ImmutableByteArray readData(int length) {
             if (position + length > tlvBinaryStruct.length) {
                 throw new TlvParserException(position,
                         "unexpected end of data to read more data of length " + length + " at position " + position
                 );
             }
 
-            final UInt8Array result = UInt8Array.of(tlvBinaryStruct, position, length);
+            final ImmutableByteArray result = ImmutableByteArray.of(tlvBinaryStruct, position, length);
             position += length;
             return result;
         }
 
-        private UInt16 readUInt16() {
+        private int readUInt16() {
             if (position + 2 > tlvBinaryStruct.length) {
                 throw new TlvParserException(position, "unexpected end of data to read an UIN1T6 value at position " + position);
             }
@@ -126,7 +126,7 @@ public class RecursiveDescentParser implements TlvParser {
             final byte low = tlvBinaryStruct[position++];
             final byte high = tlvBinaryStruct[position++];
 
-            return UInt16.of(low, high);
+            return UInt16.of(low, high).getValue();
         }
     }
 }

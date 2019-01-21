@@ -36,15 +36,9 @@ public abstract class TlvStruct {
                 .setTags(ImmutableList.of());
     }
 
-    public static TlvStruct of(int tag, byte[] data) {
-        return builder()
-                .setTag(UInt16.of(tag))
-                .setLength(UInt16.of(null == data ? 0 : data.length))
-                .setComposite(false)
-                .setData(UInt8Array.of(data))
-                .build();
-    }
-
+    /**
+     * Builds a recursive tag.
+     */
     public static TlvStruct of(int tag, TlvStruct first, TlvStruct... rest) {
         Preconditions.checkNotNull(first, "at least one tag must be not null");
 
@@ -55,8 +49,8 @@ public abstract class TlvStruct {
                 new ImmutableList.Builder<TlvStruct>().add(first).add(rest).build();
 
         return builder()
-                .setTag(UInt16.of(tag))
-                .setLength(UInt16.of(length))
+                .setTag(tag)
+                .setLength(length)
                 .setComposite(true)
                 .setTags(tags)
                 .build();
@@ -83,10 +77,10 @@ public abstract class TlvStruct {
         // build an array from the data
         final byte[] data = new byte[length];
 
-        // copy first
+        // copy the first TLV structure
         System.arraycopy(first.toByteArray(), 0, data, 0, first.length());
 
-        // copy rest
+        // copy the rest of structures
         if (null != rest) {
             int pos = first.length(); // start after the first tag
             for (TagValue tagValue : rest) {
@@ -97,25 +91,12 @@ public abstract class TlvStruct {
         }
 
         return builder()
-                .setTag(UInt16.of(tag))
-                .setLength(UInt16.of(length))
+                .setTag(tag)
+                .setLength(length)
                 .setComposite(false)
-                .setData(UInt8Array.of(data))
+                .setData(ImmutableByteArray.of(data))
                 .build();
     }
-
-
-    public abstract UInt16 tag();
-
-    public abstract UInt16 length();
-
-    public abstract int lengthAsInt();
-
-    public abstract boolean composite();
-
-    public abstract Optional<UInt8Array> data();
-
-    public abstract ImmutableList<TlvStruct> tags();
 
     /**
      * Returns a new TLV structure that is result of appending the parameter tags to the tags of the TLV structure
@@ -130,8 +111,8 @@ public abstract class TlvStruct {
         }
 
         // compute the length
-        final int length = tlvStruct.lengthAsInt() + tlvStructs.stream()
-                .mapToInt(TlvStruct::lengthAsInt)
+        final int length = tlvStruct.length() + tlvStructs.stream()
+                .mapToInt(TlvStruct::length)
                 .reduce(0, (result, value) -> TAG_HEADER_LENGTH + result + value);
 
         final ImmutableList<TlvStruct> tags = new ImmutableList.Builder<TlvStruct>()
@@ -140,50 +121,55 @@ public abstract class TlvStruct {
                 .build();
 
         return tlvStruct.toBuilder()
-                .setLength(UInt16.of(length))
+                .setLength(length)
                 .setTags(tags)
                 .build();
     }
 
     private static int computeLength(TlvStruct first, TlvStruct[] rest) {
-        return null == rest ? TAG_HEADER_LENGTH + first.lengthAsInt() :
+        return null == rest ? TAG_HEADER_LENGTH + first.length() :
                 Stream.of(rest)
-                        .mapToInt(TlvStruct::lengthAsInt)
+                        .mapToInt(TlvStruct::length)
                         .reduce(
-                                TAG_HEADER_LENGTH + first.lengthAsInt(),
+                                TAG_HEADER_LENGTH + first.length(),
                                 (result, value) -> TAG_HEADER_LENGTH + result + value
                         );
     }
 
-    public abstract Builder toBuilder();
+    public abstract boolean composite();
+
+    public abstract int tag();
+
+    public abstract ImmutableList<TlvStruct> tags();
+
+    public abstract int length();
+
+    public abstract Optional<ImmutableByteArray> data();
+
+    abstract Builder toBuilder();
 
     @AutoValue.Builder
     abstract static class Builder {
-        abstract Builder setTag(UInt16 value);
+        abstract Builder setTag(int value);
 
-        abstract Builder setLength(UInt16 value);
-
-        abstract Builder setLengthAsInt(int length);
+        abstract Builder setLength(int value);
 
         abstract Builder setComposite(boolean value);
 
-        abstract UInt16 length();
-
-        abstract Builder setData(UInt8Array data);
+        abstract Builder setData(ImmutableByteArray data);
 
         abstract Builder setTags(List<TlvStruct> tags);
 
         abstract TlvStruct autoBuild();
 
         TlvStruct build() {
-            if (null != length()) {
-                setLengthAsInt(length().getValue());
-            }
-
             final TlvStruct tlvStruct = autoBuild();
 
-            Preconditions.checkArgument(tlvStruct.tag().getValue() <= 0x3FFF, "" +
+            Preconditions.checkArgument(tlvStruct.tag() <= 0x3FFF, "" +
                     "only the first 14 bits should be used in tags to accommodate the limitations of some hardware platforms");
+
+            Preconditions.checkArgument(UInts.isUInt16(tlvStruct.tag()), "tag must be compatible with UINT16");
+            Preconditions.checkArgument(UInts.isUInt16(tlvStruct.length()), "tag must be compatible with UINT16");
 
             final boolean dataPresent = tlvStruct.data().isPresent();
             final boolean tagsEmpty = tlvStruct.tags().isEmpty();
@@ -193,7 +179,7 @@ public abstract class TlvStruct {
 
             if (tlvStruct.composite()) {
                 Preconditions.checkArgument(!tagsEmpty, "a composite tag must contain tags");
-                Preconditions.checkArgument((tlvStruct.tag().getValue() & 0x1000) > 0,
+                Preconditions.checkArgument((tlvStruct.tag() & 0x1000) > 0,
                         "a composite tag must be recursive");
             }
 

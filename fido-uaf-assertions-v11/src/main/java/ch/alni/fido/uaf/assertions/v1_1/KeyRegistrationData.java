@@ -13,6 +13,7 @@ import ch.alni.fido.uaf.authnr.tlv.TlvStruct;
 import ch.alni.fido.uaf.authnr.tlv.UInt16;
 import ch.alni.fido.uaf.authnr.tlv.UInt32;
 import ch.alni.fido.uaf.authnr.tlv.UInt8;
+import ch.alni.fido.uaf.authnr.tlv.UInt8Array;
 import ch.alni.fido.uaf.authnr.tlv.UInts;
 import ch.alni.fido.uaf.registry.v1_1.Tags;
 
@@ -25,23 +26,23 @@ public abstract class KeyRegistrationData {
     public abstract String aaid();
 
     public static KeyRegistrationData of(TlvStruct krd) {
-        final int krdTag = krd.tag().getValue();
+        final int krdTag = krd.tag();
         Preconditions.checkArgument(krdTag == Tags.TAG_UAFV1_SIGNED_DATA, "Unexpected value %d", krdTag);
 
         final Builder builder = builder();
         for (TlvStruct tlvStruct : krd.tags()) {
-            final int tag = tlvStruct.tag().getValue();
+            final int tag = tlvStruct.tag();
             switch (tag) {
                 case Tags.TAG_AAID:
                     Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_AAID(%d)", tag);
-                    tlvStruct.data().ifPresent(uInt8Array ->
-                            builder.setAaid(new String(uInt8Array.toByteArray(), StandardCharsets.UTF_8))
+                    tlvStruct.data().ifPresent(tlvData ->
+                            builder.setAaid(new String(tlvData.toByteArray(), StandardCharsets.UTF_8))
                     );
                     break;
                 case Tags.TAG_ASSERTION_INFO:
                     Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_ASSERTION_INFO(%d)", tag);
-                    tlvStruct.data().ifPresent(uInt8Array -> {
-                                final byte[] data = uInt8Array.toByteArray();
+                    tlvStruct.data().ifPresent(tlvData -> {
+                        final byte[] data = tlvData.toByteArray();
                                 Preconditions.checkArgument(data.length == 7,
                                         "Invalid length of data (%d) for tag TAG_ASSERTION_INFO(%d)", data.length, tag);
                                 builder.setAuthenticatorVersion(UInt16.of(data[0], data[1]).getValue());
@@ -58,20 +59,20 @@ public abstract class KeyRegistrationData {
 
                 case Tags.TAG_FINAL_CHALLENGE_HASH:
                     Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_FINAL_CHALLENGE_HASH(%d)", tag);
-                    tlvStruct.data().ifPresent(uInt8Array ->
-                            builder.setFinalChallengeHash(uInt8Array.toByteArray())
+                    tlvStruct.data().ifPresent(tlvData ->
+                            builder.setFinalChallengeHash(tlvData.toByteArray())
                     );
                     break;
                 case Tags.TAG_KEYID:
                     Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_KEYID(%d)", tag);
-                    tlvStruct.data().ifPresent(uInt8Array ->
-                            builder.setKeyId(uInt8Array.toByteArray())
+                    tlvStruct.data().ifPresent(tlvData ->
+                            builder.setKeyId(tlvData.toByteArray())
                     );
                     break;
                 case Tags.TAG_COUNTERS:
                     Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_COUNTERS(%d)", tag);
-                    tlvStruct.data().ifPresent(uInt8Array -> {
-                                final byte[] data = uInt8Array.toByteArray();
+                    tlvStruct.data().ifPresent(tlvData -> {
+                        final byte[] data = tlvData.toByteArray();
                                 Preconditions.checkArgument(data.length == 8,
                                         "Invalid length of data (%d) for tag TAG_COUNTERS(%d)", data.length, tag);
                                 builder.setSignatureCounter(UInt32.of(data[0], data[1], data[2], data[3]).getValue());
@@ -81,8 +82,8 @@ public abstract class KeyRegistrationData {
                     break;
                 case Tags.TAG_PUB_KEY:
                     Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_PUB_KEY(%d)", tag);
-                    tlvStruct.data().ifPresent(uInt8Array ->
-                            builder.setUserAuthPubKey(uInt8Array.toByteArray())
+                    tlvStruct.data().ifPresent(tlvData ->
+                            builder.setUserAuthPubKey(tlvData.toByteArray())
                     );
                     break;
                 case Tags.TAG_EXTENSION:
@@ -127,20 +128,20 @@ public abstract class KeyRegistrationData {
      */
     public TlvStruct toTlvStruct() {
         final TlvStruct result = TlvStruct.of(Tags.TAG_UAFV1_KRD,
-                TlvStruct.of(Tags.TAG_AAID, aaid().getBytes(StandardCharsets.UTF_8)),
+                TlvStruct.of(Tags.TAG_AAID, UInt8Array.of(aaid().getBytes(StandardCharsets.UTF_8))),
                 TlvStruct.of(Tags.TAG_ASSERTION_INFO,
                         UInt16.of(authenticatorVersion()),
                         UInt8.of(authenticationMode()),
                         UInt16.of(signatureAlgAndEncoding().getCode()),
                         UInt16.of(publicKeyAlgAndEncoding().getCode())
                 ),
-                TlvStruct.of(Tags.TAG_FINAL_CHALLENGE_HASH, finalChallengeHash()),
-                TlvStruct.of(Tags.TAG_KEYID, keyId()),
+                TlvStruct.of(Tags.TAG_FINAL_CHALLENGE_HASH, UInt8Array.of(finalChallengeHash())),
+                TlvStruct.of(Tags.TAG_KEYID, UInt8Array.of(keyId())),
                 TlvStruct.of(Tags.TAG_COUNTERS,
                         UInt32.of(signatureCounter()),
                         UInt32.of(registrationCounter())
                 ),
-                TlvStruct.of(Tags.TAG_PUB_KEY, userAuthPubKey())
+                TlvStruct.of(Tags.TAG_PUB_KEY, UInt8Array.of(userAuthPubKey()))
         );
 
         return TlvStruct.extend(result, Extension.toTlvStructList(extensions()));
