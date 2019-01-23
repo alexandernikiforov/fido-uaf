@@ -13,7 +13,7 @@ sourceSets {
 dependencies {
     api project(':fido-uaf-tlv')
     api project(':fido-registry-v11')
-    api "com.google.auto.value:auto-value-annotations:1.6.3"
+    compileOnly "com.google.auto.value:auto-value-annotations:1.6.3"
     api group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
     api (group: 'com.google.guava', name: 'guava', version: '27.0.1-jre') {
         transitive = false

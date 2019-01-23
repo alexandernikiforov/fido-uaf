@@ -12,7 +12,7 @@ sourceSets {
 
 dependencies {
     api project(':fido-registry-v11')
-    api "com.google.auto.value:auto-value-annotations:1.6.3"
+    compileOnly "com.google.auto.value:auto-value-annotations:1.6.3"
     annotationProcessor "com.google.auto.value:auto-value:1.6.3"
     api (group: 'com.google.guava', name: 'guava', version: '27.0.1-jre') {
         transitive = false
