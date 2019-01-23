@@ -11,4 +11,14 @@ cache:
     - $HOME/.gradle
 
 addons:
+  apt:
+    packages:
+      - bash
+
 script: ./gradlew clean build
+
+after_failure:
+  - ./gradlew clean check --debug
+
+#after_success:
+#  - bash gradlew jacocoTestReport coveralls
