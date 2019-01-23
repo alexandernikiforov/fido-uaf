@@ -15,7 +15,7 @@ import java.util.List;
 @AutoValue
 @JsonDeserialize(builder = Policy.Builder.class)
 public abstract class Policy {
-    static Builder builder() {
+    public static Builder builder() {
         return new AutoValue_Policy.Builder()
                 .setDisallowed(ImmutableList.of());
     }
@@ -29,7 +29,7 @@ public abstract class Policy {
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "set")
-    abstract static class Builder {
+    public abstract static class Builder {
         @JsonCreator
         static Builder create() {
             return builder();

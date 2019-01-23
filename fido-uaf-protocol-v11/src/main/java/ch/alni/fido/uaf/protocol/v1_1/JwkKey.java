@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 @AutoValue
 @JsonDeserialize(builder = JwkKey.Builder.class)
 public abstract class JwkKey {
-    static Builder builder() {
+    public static Builder builder() {
         return new AutoValue_JwkKey.Builder()
                 .setKty("EC")
                 .setCrv("P-256")
@@ -32,7 +32,7 @@ public abstract class JwkKey {
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "set")
-    abstract static class Builder {
+    public abstract static class Builder {
         @JsonCreator
         static Builder create() {
             return builder();
@@ -50,6 +50,6 @@ public abstract class JwkKey {
         @JsonSetter
         public abstract Builder setY(String value);
 
-        abstract JwkKey build();
+        public abstract JwkKey build();
     }
 }
