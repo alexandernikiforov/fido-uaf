@@ -1,1 +1,14 @@
 language: java
+
+before_cache:
+  - for lockFile in $(find ~/.gradle -name "*.lock");
+    do sudo rm -rf $lockFile;
+    done
+
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.gradle
+
+addons:
+script: ./gradlew clean build
