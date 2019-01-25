@@ -37,9 +37,9 @@ import static ch.alni.fido.uaf.protocol.v1_1.Enums.toEnumSet;
 public abstract class MatchCriteria {
     public static Builder builder() {
         return new AutoValue_MatchCriteria.Builder()
-                .setAaids(ImmutableList.of())
-                .setVendorIds(ImmutableList.of())
-                .setKeyIds(ImmutableList.of())
+                .setAaids(ImmutableSet.of())
+                .setVendorIds(ImmutableSet.of())
+                .setKeyIds(ImmutableSet.of())
 
                 .setUserVerificationAsLong(0)
                 .setUserVerification(ImmutableSet.of())
@@ -56,21 +56,20 @@ public abstract class MatchCriteria {
                 .setAssertionSchemes(ImmutableList.of())
                 .setAttestationTypes(ImmutableList.of())
                 .setExtensions(ImmutableList.of())
-                .setAuthenticatorVersion(0)
                 ;
     }
 
     @JsonGetter("aaid")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public abstract ImmutableList<String> aaids();
+    public abstract ImmutableSet<String> aaids();
 
     @JsonGetter("vendorID")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public abstract ImmutableList<String> vendorIds();
+    public abstract ImmutableSet<String> vendorIds();
 
     @JsonGetter("keyIDs")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public abstract ImmutableList<String> keyIds();
+    public abstract ImmutableSet<String> keyIds();
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -137,13 +136,13 @@ public abstract class MatchCriteria {
         }
 
         @JsonSetter("aaid")
-        public abstract Builder setAaids(List<String> value);
+        public abstract Builder setAaids(Set<String> value);
 
         @JsonSetter("vendorID")
-        public abstract Builder setVendorIds(List<String> value);
+        public abstract Builder setVendorIds(Set<String> value);
 
         @JsonSetter("keyIDs")
-        public abstract Builder setKeyIds(List<String> value);
+        public abstract Builder setKeyIds(Set<String> value);
 
         @JsonSetter("userVerification")
         abstract Builder setUserVerificationAsLong(long value);

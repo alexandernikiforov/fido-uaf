@@ -19,6 +19,8 @@ dependencies {
     }
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.9.8'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.8'
     api group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
 
     testImplementation group: 'commons-io', name: 'commons-io', version: '2.6'

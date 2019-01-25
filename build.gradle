@@ -1,28 +1,87 @@
 group 'ch.alni'
 version '0.1.0'
 
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
+    }
+}
+
 allprojects {
+
     repositories {
         mavenCentral()
     }
 
     apply plugin: 'idea'
+    apply plugin: 'jacoco'
+    apply plugin: "com.github.kt3k.coveralls"
+}
+
+subprojects {
 }
 
 subprojects {
     ext {
         generatedJavaDir = "$buildDir/generated/java"
     }
-    
-    afterEvaluate { Project project ->
-        project.tasks.withType(JavaCompile) {
-            sourceCompatibility = '1.8'
-            targetCompatibility = '1.8'
-            
-            compileJava {
-                options.annotationProcessorGeneratedSourcesDirectory = project.file(project.generatedJavaDir)
+
+    project.tasks.withType(JavaCompile) {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+
+        compileJava {
+            options.annotationProcessorGeneratedSourcesDirectory = project.file(project.generatedJavaDir)
+        }
+    }
+
+    project.tasks.withType(JacocoReport) {
+        reports {
+            xml.enabled = true // coveralls plugin depends on xml format report
+            html.enabled = true
+        }
+        classDirectories.setFrom sourceSets.main.allSource
+    }
+}
+
+task jacocoMerge(type: JacocoMerge) {
+    executionData = project.fileTree(dir: project.rootDir, includes: ['**/jacoco/*.exec'], excludes: ['**/jacocoMerge.exec'])
+}
+
+task jacocoRootReport(type: JacocoReport) {
+    executionData.setFrom project.tasks.jacocoMerge.asType(JacocoMerge).executionData
+
+    doFirst {
+        subprojects.findAll { Project subproject ->
+            subproject.tasks.findAll { Task task -> task.extensions.findByType(JacocoTaskExtension) }
+        }
+        .each {Project subproject ->
+            def javaPluginConvention =  subproject.convention.getPlugin(JavaPluginConvention.class)
+            if (javaPluginConvention) {
+                sourceSets(javaPluginConvention.sourceSets.main)
             }
         }
+    }
+    
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+    }
+}
+
+coveralls {
+    jacocoReportPath = project.tasks.jacocoRootReport.asType(JacocoReport).reports.xml.destination.path
+}
+
+task printIt {
+    doLast {
+       println project.tasks.jacocoRootReport.asType(JacocoReport).reports.xml.destination.path
     }
 }
 

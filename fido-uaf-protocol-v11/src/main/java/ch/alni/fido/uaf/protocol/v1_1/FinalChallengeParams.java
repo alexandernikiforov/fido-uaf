@@ -19,7 +19,7 @@ public abstract class FinalChallengeParams {
     public abstract String appId();
 
     @JsonGetter
-    public abstract String serverChallenge();
+    public abstract String challenge();
 
     @JsonGetter("facetID")
     public abstract String facetId();
@@ -39,7 +39,7 @@ public abstract class FinalChallengeParams {
         public abstract Builder setAppId(String value);
 
         @JsonSetter
-        public abstract Builder setServerChallenge(String value);
+        public abstract Builder setChallenge(String value);
 
         @JsonSetter("facetID")
         public abstract Builder setFacetId(String value);
