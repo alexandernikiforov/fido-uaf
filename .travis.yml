@@ -7,15 +7,12 @@ before_cache:
 
 cache:
   directories:
-    - $HOME/.m2
     - $HOME/.gradle
 
 addons:
   apt:
     packages:
       - bash
-
-script: ./gradlew clean build
 
 after_failure:
   - ./gradlew clean check --debug

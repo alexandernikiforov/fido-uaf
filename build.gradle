@@ -12,6 +12,8 @@ buildscript {
     }
 }
 
+apply plugin: "com.github.kt3k.coveralls"
+
 allprojects {
 
     repositories {
@@ -20,7 +22,6 @@ allprojects {
 
     apply plugin: 'idea'
     apply plugin: 'jacoco'
-    apply plugin: "com.github.kt3k.coveralls"
 }
 
 subprojects {
