@@ -55,6 +55,7 @@ task jacocoMerge(type: JacocoMerge) {
 }
 
 task jacocoRootReport(type: JacocoReport) {
+    executionData.builtBy project.tasks.jacocoMerge
     executionData.setFrom project.tasks.jacocoMerge.asType(JacocoMerge).executionData
 
     doFirst {
@@ -78,6 +79,10 @@ task jacocoRootReport(type: JacocoReport) {
 
 coveralls {
     jacocoReportPath = project.tasks.jacocoRootReport.asType(JacocoReport).reports.xml.destination.path
+}
+
+tasks.coveralls {
+    dependsOn jacocoRootReport
 }
 
 task printIt {

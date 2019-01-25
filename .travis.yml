@@ -18,4 +18,4 @@ after_failure:
   - ./gradlew clean check --debug
 
 after_success:
-  - ./gradlew jacocoMerge jacocoRootReport coveralls
+  - ./gradlew jacocoMerge jacocoRootReport coveralls --info
