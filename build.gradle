@@ -79,6 +79,10 @@ task jacocoRootReport(type: JacocoReport) {
 
 coveralls {
     jacocoReportPath = project.tasks.jacocoRootReport.asType(JacocoReport).reports.xml.destination.path
+
+    afterEvaluate {
+        setSourceDirs getSubprojectSourceDirs();
+    }
 }
 
 tasks.coveralls {
@@ -87,8 +91,22 @@ tasks.coveralls {
 
 task printIt {
     doLast {
-       println project.tasks.jacocoRootReport.asType(JacocoReport).reports.xml.destination.path
+        getSubprojectSourceDirs()
     }
+}
+
+private def getSubprojectSourceDirs() {
+    def sourceDirs = []
+    subprojects.findAll { Project subproject ->
+        subproject.tasks.findAll { Task task -> task.extensions.findByType(JacocoTaskExtension) }
+    }
+    .each { Project subproject ->
+        def javaPluginConvention = subproject.convention.getPlugin(JavaPluginConvention.class)
+        if (javaPluginConvention) {
+            sourceDirs += javaPluginConvention.sourceSets.main.java.srcDirs
+        }
+    }
+    return sourceDirs;
 }
 
 wrapper {

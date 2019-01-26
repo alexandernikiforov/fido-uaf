@@ -15,7 +15,7 @@ addons:
       - bash
 
 after_failure:
-  - ./gradlew clean check --debug
+  - ./gradlew clean check
 
 after_success:
   - ./gradlew jacocoMerge jacocoRootReport coveralls --info
