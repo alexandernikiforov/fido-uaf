@@ -81,9 +81,8 @@ task jacocoRootReport(type: JacocoReport) {
 coveralls {
     jacocoReportPath = project.tasks.jacocoRootReport.asType(JacocoReport).reports.xml.destination.path
     
-    sourceDirs = project.fileTree('.') {
-        includes = ['**/src/main/java', '**/build/generated/java']
-    }.files.collect { it.path }.asList()
+    sourceDirs = project.fileTree(dir:  '.', includes: ['**/src/main/java/**', '**/build/generated/java/**'])
+            .files.collect { it.path }.asList()
 }
 
 tasks.coveralls {
@@ -92,7 +91,9 @@ tasks.coveralls {
 
 task printIt {
     doLast {
-        getSubprojectSourceDirs()
+        def hello = project.fileTree(dir:  '.', includes: ['**/src/main/java/**', '**/build/generated/java/**']).files
+            .collect { it.path }.asList()
+        println hello
     }
 }
 
