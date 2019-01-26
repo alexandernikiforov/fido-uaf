@@ -91,29 +91,6 @@ tasks.coveralls {
     dependsOn jacocoRootReport
 }
 
-task printIt {
-    doLast {
-        def hello = project.subprojects.collectMany { Project subproject ->
-            [ subproject.file('src/main/java/').path, subproject.file('build/generated/java/').path]
-        } as List<String>
-        println hello
-    }
-}
-
-private def getSubprojectSourceDirs() {
-    def sourceDirs = []
-    subprojects.findAll { Project subproject ->
-        subproject.tasks.withType(JavaCompile)
-    }
-    .each { Project subproject ->
-        def javaPluginConvention = subproject.convention.getPlugin(JavaPluginConvention.class)
-        if (javaPluginConvention) {
-            sourceDirs += javaPluginConvention.sourceSets.main.java.srcDirs
-        }
-    }
-    return sourceDirs;
-}
-
 wrapper {
-    gradleVersion = '5.0'
+    gradleVersion = '5.1.1'
 }

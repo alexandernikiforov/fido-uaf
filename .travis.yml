@@ -1,21 +1,24 @@
 language: java
 
 before_cache:
-  - for lockFile in $(find ~/.gradle -name "*.lock");
-    do sudo rm -rf $lockFile;
-    done
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+jdk:
+  - oraclejdk8
 
 cache:
   directories:
-    - $HOME/.gradle
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.m2
 
-addons:
-  apt:
-    packages:
-      - bash
+install:
+  - ./gradlew wrapper --gradle-version 5.1.1
+  - ./gradlew -v
 
-after_failure:
-  - ./gradlew clean check
+script:
+  - ./gradlew build --continue
 
 after_success:
-  - ./gradlew jacocoMerge jacocoRootReport coveralls --info
+  - ./gradlew coveralls --info
