@@ -27,6 +27,7 @@ allprojects {
 subprojects {
 }
 
+
 subprojects {
     ext {
         generatedJavaDir = "$buildDir/generated/java"
@@ -79,10 +80,10 @@ task jacocoRootReport(type: JacocoReport) {
 
 coveralls {
     jacocoReportPath = project.tasks.jacocoRootReport.asType(JacocoReport).reports.xml.destination.path
-
-    afterEvaluate {
-        setSourceDirs getSubprojectSourceDirs();
-    }
+    
+    sourceDirs = project.fileTree('.') {
+        includes = ['**/src/main/java', '**/build/generated/java']
+    }.collect { it.path }.asList()
 }
 
 tasks.coveralls {
@@ -98,7 +99,7 @@ task printIt {
 private def getSubprojectSourceDirs() {
     def sourceDirs = []
     subprojects.findAll { Project subproject ->
-        subproject.tasks.findAll { Task task -> task.extensions.findByType(JacocoTaskExtension) }
+        subproject.tasks.withType(JavaCompile)
     }
     .each { Project subproject ->
         def javaPluginConvention = subproject.convention.getPlugin(JavaPluginConvention.class)
