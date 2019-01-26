@@ -83,7 +83,7 @@ coveralls {
     
     sourceDirs = project.fileTree('.') {
         includes = ['**/src/main/java', '**/build/generated/java']
-    }.collect { it.path }.asList()
+    }.files.collect { it.path }.asList()
 }
 
 tasks.coveralls {
