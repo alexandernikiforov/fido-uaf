@@ -1,18 +1,27 @@
-group 'ch.alni'
-version '0.1.0'
+/*
+ *      FIDO UAF 1.1 Protocol and Assertion Parser Support
+ *      Copyright (C) 2019  Alexander Nikiforov
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU General Public License as published by
+ *      the Free Software Foundation, either version 3 of the License, or
+ *      (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
+ *
+ *      You should have received a copy of the GNU General Public License
+ *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
-    }
+plugins {
+    id 'com.github.kt3k.coveralls' version '2.8.2'
 }
 
-apply plugin: "com.github.kt3k.coveralls"
+group 'ch.alni'
+version '0.1.0'
 
 allprojects {
 
@@ -23,10 +32,6 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'jacoco'
 }
-
-subprojects {
-}
-
 
 subprojects {
     ext {
@@ -63,14 +68,14 @@ task jacocoRootReport(type: JacocoReport) {
         subprojects.findAll { Project subproject ->
             subproject.tasks.findAll { Task task -> task.extensions.findByType(JacocoTaskExtension) }
         }
-        .each {Project subproject ->
-            def javaPluginConvention =  subproject.convention.getPlugin(JavaPluginConvention.class)
+        .each { Project subproject ->
+            def javaPluginConvention = subproject.convention.getPlugin(JavaPluginConvention.class)
             if (javaPluginConvention) {
                 sourceSets(javaPluginConvention.sourceSets.main)
             }
         }
     }
-    
+
     reports {
         html.enabled = true
         xml.enabled = true
@@ -80,11 +85,12 @@ task jacocoRootReport(type: JacocoReport) {
 
 coveralls {
     jacocoReportPath = project.tasks.jacocoRootReport.asType(JacocoReport).reports.xml.destination.path
-    
-    sourceDirs = project.subprojects.collectMany { Project subproject ->
-        [ subproject.file('src/main/java/').path, subproject.file('build/generated/java/').path]
-    } as List<String>
 
+    // unfortunately, in case of a multiproject build the Coveralls plugin does not provide any possibility to re-configure the 
+    // sources other than to hard code them for each source set in the subprojects
+    sourceDirs = project.subprojects.collectMany { Project subproject ->
+        [subproject.file('src/main/java/').path, subproject.file('build/generated/java/').path]
+    } as List<String>
 }
 
 tasks.coveralls {

@@ -1,3 +1,21 @@
+/*
+ *      FIDO UAF 1.1 Protocol and Assertion Parser Support
+ *      Copyright (C) 2019  Alexander Nikiforov
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU General Public License as published by
+ *      the Free Software Foundation, either version 3 of the License, or
+ *      (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
+ *
+ *      You should have received a copy of the GNU General Public License
+ *      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package ch.alni.fido.uaf.assertions.v1_1;
 
 import com.google.auto.value.AutoValue;
@@ -42,7 +60,7 @@ public abstract class SignedData {
                 case Tags.TAG_ASSERTION_INFO:
                     Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_ASSERTION_INFO(%d)", tag);
                     tlvStruct.data().ifPresent(tlvData -> {
-                        final byte[] data = tlvData.toByteArray();
+                                final byte[] data = tlvData.toByteArray();
                                 Preconditions.checkArgument(data.length == 5,
                                         "invalid length of data (%d) for tag TAG_ASSERTION_INFO(%d)", data.length, tag);
                                 builder.setAuthenticatorVersion(UInt16.of(data[0], data[1]).getValue());
@@ -81,7 +99,7 @@ public abstract class SignedData {
                 case Tags.TAG_COUNTERS:
                     Preconditions.checkArgument(tlvStruct.data().isPresent(), "Data missing for tag TAG_COUNTERS(%d)", tag);
                     tlvStruct.data().ifPresent(tlvData -> {
-                        final byte[] data = tlvData.toByteArray();
+                                final byte[] data = tlvData.toByteArray();
                                 Preconditions.checkArgument(data.length == 4,
                                         "invalid length of data (%d) for tag TAG_COUNTERS(%d)", data.length, tag);
                                 builder.setSignatureCounter(UInt32.of(data[0], data[1], data[2], data[3]).getValue());
