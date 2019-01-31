@@ -71,9 +71,9 @@ public abstract class MatchCriteria {
                 .setTcDisplayAsInt(0)
                 .setTcDisplay(ImmutableSet.of())
 
-                .setAuthenticationAlgorithms(ImmutableList.of())
-                .setAssertionSchemes(ImmutableList.of())
-                .setAttestationTypes(ImmutableList.of())
+                .setAuthenticationAlgorithms(ImmutableSet.of())
+                .setAssertionSchemes(ImmutableSet.of())
+                .setAttestationTypes(ImmutableSet.of())
                 .setExtensions(ImmutableList.of())
                 ;
     }
@@ -128,15 +128,15 @@ public abstract class MatchCriteria {
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonSerialize(contentUsing = AuthenticationAlgorithmSerializer.class)
-    public abstract ImmutableList<SignatureAlgAndEncoding> authenticationAlgorithms();
+    public abstract ImmutableSet<SignatureAlgAndEncoding> authenticationAlgorithms();
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public abstract ImmutableList<String> assertionSchemes();
+    public abstract ImmutableSet<String> assertionSchemes();
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public abstract ImmutableList<AttestationType> attestationTypes();
+    public abstract ImmutableSet<AttestationType> attestationTypes();
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -190,13 +190,13 @@ public abstract class MatchCriteria {
 
         @JsonSetter
         @JsonDeserialize(contentUsing = AuthenticationAlgorithmDeserializer.class)
-        public abstract Builder setAuthenticationAlgorithms(List<SignatureAlgAndEncoding> value);
+        public abstract Builder setAuthenticationAlgorithms(Set<SignatureAlgAndEncoding> value);
 
         @JsonSetter
-        public abstract Builder setAssertionSchemes(List<String> value);
+        public abstract Builder setAssertionSchemes(Set<String> value);
 
         @JsonSetter
-        public abstract Builder setAttestationTypes(List<AttestationType> value);
+        public abstract Builder setAttestationTypes(Set<AttestationType> value);
 
         @JsonSetter
         public abstract Builder setAuthenticatorVersion(int value);
