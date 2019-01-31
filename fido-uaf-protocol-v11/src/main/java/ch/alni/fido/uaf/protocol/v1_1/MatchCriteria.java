@@ -45,6 +45,7 @@ import ch.alni.fido.uaf.protocol.v1_1.registry.AuthenticationAlgorithmDeserializ
 import ch.alni.fido.uaf.protocol.v1_1.registry.AuthenticationAlgorithmSerializer;
 import ch.alni.fido.uaf.protocol.v1_1.registry.KeyProtectionSerializer;
 import ch.alni.fido.uaf.protocol.v1_1.registry.MatcherProtectionSerializer;
+import ch.alni.fido.uaf.protocol.v1_1.registry.TransactionConfirmationDisplaySerializer;
 import ch.alni.fido.uaf.protocol.v1_1.registry.UserVerificationMethodSerializer;
 
 import static ch.alni.fido.uaf.protocol.v1_1.Enums.toBitValue;
@@ -119,6 +120,7 @@ public abstract class MatchCriteria {
 
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonSerialize(using = TransactionConfirmationDisplaySerializer.class)
     public abstract ImmutableSet<TransactionConfirmationDisplay> tcDisplay();
 
     abstract int tcDisplayAsInt();
@@ -126,7 +128,6 @@ public abstract class MatchCriteria {
     @JsonGetter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonSerialize(contentUsing = AuthenticationAlgorithmSerializer.class)
-    @JsonDeserialize(contentUsing = AuthenticationAlgorithmDeserializer.class)
     public abstract ImmutableList<SignatureAlgAndEncoding> authenticationAlgorithms();
 
     @JsonGetter
@@ -188,6 +189,7 @@ public abstract class MatchCriteria {
         public abstract Builder setTcDisplay(Set<TransactionConfirmationDisplay> value);
 
         @JsonSetter
+        @JsonDeserialize(contentUsing = AuthenticationAlgorithmDeserializer.class)
         public abstract Builder setAuthenticationAlgorithms(List<SignatureAlgAndEncoding> value);
 
         @JsonSetter
